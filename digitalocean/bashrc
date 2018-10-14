@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
+set -a
+. $ABSOLUTE_PATH/env
+set +a
+
+PS1="(do) $PS1"
+
+?() {
+  bash -c ". '$ABSOLUTE_PATH/bashrc'; typeset -F | cut -d' ' -f3 | grep -v ^__"
+}
+
+__curl-do() {
+  curl -X ${1:-GET} "https://api.digitalocean.com/v2/$2" -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" "${@:3}"
+}
+
+__ssh-key-fingerprint() {
+  ssh-keygen -E md5 -lf "$PUBLIC_SSH_KEY_FILE" | cut -d' ' -f2 | cut -c5-
+}
+
+list-ssh-keys() {
+  __curl-do GET account/keys "$@"
+}
+
+list-ssh-key() {
+  __curl-do GET "account/keys/$(__ssh-key-fingerprint)" "$@"
+}
+
+create-ssh-key() {
+  __curl-do POST account/keys -d "$(<"$PUBLIC_SSH_KEY_FILE" jq -Rs '{name: "Personal", public_key: .}')" "$@"
+}
+
+delete-ssh-key() {
+  local ssh_key_id="$1"
+  __curl-do DELETE "account/keys/$ssh_key_id" -d '' "$@"
+}
+
+list-droplets() {
+  __curl-do GET droplets "$@"
+}
+
+create-droplet() {
+  local data="$(<"$ABSOLUTE_PATH/droplet.json" jq --arg name "$1" --arg ssh_key "$(__ssh-key-fingerprint)" '.name |= $name | .ssh_keys |= . + [$ssh_key]')"
+  __curl-do POST droplets -d "$data" "${@:2}"
+}
+
+__droplet-id() {
+  list-droplets | jq --arg name "$1" '.droplets | map(select(.name == $name)) | first | .id'
+}
+
+delete-droplet() {
+  local droplet_id="$(__droplet-id "$1")"
+  __curl-do DELETE "droplets/$droplet_id" -d '' "${@:2}"
+}
