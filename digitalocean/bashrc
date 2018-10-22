@@ -47,10 +47,30 @@ create-droplet() {
 }
 
 __droplet-id() {
-  list-droplets | jq --arg name "$1" '.droplets | map(select(.name == $name)) | first | .id'
+  list-droplets | jq -r --arg name "$1" '.droplets | map(select(.name == $name)) | first | .id'
 }
 
 delete-droplet() {
   local droplet_id="$(__droplet-id "$1")"
   __curl-do DELETE "droplets/$droplet_id" -d '' "${@:2}"
+}
+
+list-volumes() {
+  __curl-do GET volumes "$@"
+}
+
+create-volume() {
+  local data="$(<"$ABSOLUTE_PATH/volume.json" jq --arg name "$1" '.name |= $name')"
+  __curl-do POST volumes -d "$data" "${@:2}"
+}
+
+__volume-id() {
+  list-volumes | jq -r --arg name "$1" '.volumes | map(select(.name == $name)) | first | .id'
+}
+
+delete-volume() {
+  read -p 'enter the volume id: ' given_volume_id
+  local volume_id="$(__volume-id "$1")"
+  test "$given_volume_id" = "$volume_id" || exit 1
+  __curl-do DELETE "volumes/$volume_id" -d '' "${@:2}"
 }
