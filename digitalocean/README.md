@@ -17,6 +17,11 @@ Upload your SSH key, and create a volume and a droplet:
     (do) $ create-ssh
     (do) $ create-volume volume1
     (do) $ create-droplet droplet1
+    (do) $ attach-volume volume1 droplet1
+
+SSH in there:
+
+    (do) $ ssh-droplet droplet1
 
 Destroy the droplet:
 

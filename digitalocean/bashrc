@@ -50,9 +50,17 @@ __droplet-id() {
   list-droplets | jq -r --arg name "$1" '.droplets | map(select(.name == $name)) | first | .id'
 }
 
+__droplet-ip() {
+  list-droplets | jq -r --arg name "$1" '.droplets | map(select(.name == $name)) | first | .networks.v4 | first | .ip_address'
+}
+
 delete-droplet() {
   local droplet_id="$(__droplet-id "$1")"
   __curl-do DELETE "droplets/$droplet_id" -d '' "${@:2}"
+}
+
+ssh-droplet() {
+  ssh "root@$(__droplet-ip "$1")"
 }
 
 list-volumes() {
@@ -73,4 +81,16 @@ delete-volume() {
   local volume_id="$(__volume-id "$1")"
   test "$given_volume_id" = "$volume_id" || exit 1
   __curl-do DELETE "volumes/$volume_id" -d '' "${@:2}"
+}
+
+attach-volume() {
+  local droplet_id="$(__droplet-id "$2")"
+  local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"attach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
+  __curl-do POST "volumes/actions" -d "$data" "${@:3}"
+}
+
+detach-volume() {
+  local droplet_id="$(__droplet-id "$2")"
+  local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"detach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
+  __curl-do POST "volumes/actions" -d "$data" "${@:3}"
 }
