@@ -42,7 +42,7 @@ list-droplets() {
 }
 
 create-droplet() {
-  local data="$(<"$ABSOLUTE_PATH/droplet.json" jq --arg name "$1" --arg ssh_key "$(__ssh-key-fingerprint)" '.name |= $name | .ssh_keys |= . + [$ssh_key]')"
+  local data="$(<"$ABSOLUTE_PATH/droplet.json" jq --arg user_data "$(cat init.sh)" --arg name "$1" --arg ssh_key "$(__ssh-key-fingerprint)" '. + {name: $name, ssh_keys: [$ssh_key], user_data: $user_data}')"
   __curl-do POST droplets -d "$data"
 }
 
