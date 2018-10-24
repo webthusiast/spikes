@@ -29,6 +29,6 @@ Destroy the droplet:
 
 Generally, don't destroy the volume. But if you really want to:
 
-    (do) $ list-volumes | jq '.volumes | map({id: .id, name: .name})'
+    (do) $ list-volumes | jq '.volumes | map({id, name})'
     (do) $ delete-volume volume1
     enter the volume id: ...
