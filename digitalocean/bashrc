@@ -21,29 +21,29 @@ __ssh-key-fingerprint() {
 }
 
 list-ssh-keys() {
-  __curl-do GET account/keys "$@"
+  __curl-do GET account/keys
 }
 
 list-ssh-key() {
-  __curl-do GET "account/keys/$(__ssh-key-fingerprint)" "$@"
+  __curl-do GET "account/keys/$(__ssh-key-fingerprint)"
 }
 
 create-ssh-key() {
-  __curl-do POST account/keys -d "$(<"$PUBLIC_SSH_KEY_FILE" jq -Rs '{name: "Personal", public_key: .}')" "$@"
+  __curl-do POST account/keys -d "$(<"$PUBLIC_SSH_KEY_FILE" jq -Rs '{name: "Personal", public_key: .}')"
 }
 
 delete-ssh-key() {
   local ssh_key_id="$1"
-  __curl-do DELETE "account/keys/$ssh_key_id" -d '' "$@"
+  __curl-do DELETE "account/keys/$ssh_key_id" -d ''
 }
 
 list-droplets() {
-  __curl-do GET droplets "$@"
+  __curl-do GET droplets
 }
 
 create-droplet() {
   local data="$(<"$ABSOLUTE_PATH/droplet.json" jq --arg name "$1" --arg ssh_key "$(__ssh-key-fingerprint)" '.name |= $name | .ssh_keys |= . + [$ssh_key]')"
-  __curl-do POST droplets -d "$data" "${@:2}"
+  __curl-do POST droplets -d "$data"
 }
 
 __droplet-id() {
@@ -56,7 +56,7 @@ __droplet-ip() {
 
 delete-droplet() {
   local droplet_id="$(__droplet-id "$1")"
-  __curl-do DELETE "droplets/$droplet_id" -d '' "${@:2}"
+  __curl-do DELETE "droplets/$droplet_id" -d ''
 }
 
 ssh-droplet() {
@@ -64,12 +64,12 @@ ssh-droplet() {
 }
 
 list-volumes() {
-  __curl-do GET volumes "$@"
+  __curl-do GET volumes
 }
 
 create-volume() {
   local data="$(<"$ABSOLUTE_PATH/volume.json" jq --arg name "$1" '.name |= $name')"
-  __curl-do POST volumes -d "$data" "${@:2}"
+  __curl-do POST volumes -d "$data"
 }
 
 __volume-id() {
@@ -80,17 +80,17 @@ delete-volume() {
   read -p 'enter the volume id: ' given_volume_id
   local volume_id="$(__volume-id "$1")"
   test "$given_volume_id" = "$volume_id" || exit 1
-  __curl-do DELETE "volumes/$volume_id" -d '' "${@:2}"
+  __curl-do DELETE "volumes/$volume_id" -d ''
 }
 
 attach-volume() {
   local droplet_id="$(__droplet-id "$2")"
   local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"attach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
-  __curl-do POST "volumes/actions" -d "$data" "${@:3}"
+  __curl-do POST "volumes/actions" -d "$data"
 }
 
 detach-volume() {
   local droplet_id="$(__droplet-id "$2")"
   local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"detach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
-  __curl-do POST "volumes/actions" -d "$data" "${@:3}"
+  __curl-do POST "volumes/actions" -d "$data"
 }
