@@ -15,20 +15,14 @@ Now list all convenience functions from the bashrc:
 Upload your SSH key, and create a volume and a droplet:
 
     (do) $ create-ssh
-    (do) $ create-volume volume1
-    (do) $ create-droplet droplet1
-    (do) $ attach-volume volume1 droplet1
+    (do) $ create-volume
+    (do) $ create-droplet
 
 SSH in there:
 
-    (do) $ ssh-droplet droplet1
+    (do) $ ssh-droplet
 
-Destroy the droplet:
+Destroy the droplet and volume:
 
-    (do) $ delete-droplet droplet1
-
-Generally, don't destroy the volume. But if you really want to:
-
-    (do) $ list-volumes | jq '.volumes | map({id, name})'
-    (do) $ delete-volume volume1
-    enter the volume id: ...
+    (do) $ delete-droplet
+    (do) $ delete-volume

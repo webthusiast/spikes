@@ -41,57 +41,59 @@ list-droplets() {
   __curl-do GET droplets
 }
 
-create-droplet() {
+__droplet-json() {
   local user_data="$(./write-mime-multipart init.sh:x-shellscript init.conf:cloud-config)"
-  local data="$(<"$ABSOLUTE_PATH/droplet.json" jq --arg user_data "$user_data" --arg name "$1" --arg ssh_key "$(__ssh-key-fingerprint)" '. + {name: $name, ssh_keys: [$ssh_key], user_data: $user_data}')"
-  __curl-do POST droplets -d "$data"
+  jq -n --arg ssh_key "$(__ssh-key-fingerprint)" --arg volume "$(__volume-id)" --arg user_data "$user_data" -f "$ABSOLUTE_PATH/droplet.jq"
+}
+
+create-droplet() {
+  __curl-do POST droplets -d "$(__droplet-json)"
+}
+
+__droplet-name() {
+  __droplet-json | jq -r .name
 }
 
 __droplet-id() {
-  list-droplets | jq -r --arg name "$1" '.droplets | map(select(.name == $name)) | first | .id'
+  list-droplets | jq -r --arg name "$(__droplet-name)" '.droplets | map(select(.name == $name)) | first | .id'
+}
+
+list-droplet() {
+  __curl-do GET "droplets/$(__droplet-id)"
 }
 
 __droplet-ip() {
-  list-droplets | jq -r --arg name "$1" '.droplets | map(select(.name == $name)) | first | .networks.v4 | first | .ip_address'
+  list-droplet | jq -r '.droplet.networks.v4 | first | .ip_address'
 }
 
 delete-droplet() {
-  local droplet_id="$(__droplet-id "$1")"
-  __curl-do DELETE "droplets/$droplet_id" -d ''
+  __curl-do DELETE "droplets/$(__droplet-id)" -d ''
 }
 
 ssh-droplet() {
-  ssh "root@$(__droplet-ip "$1")"
+  ssh "root@$(__droplet-ip)"
 }
 
 list-volumes() {
   __curl-do GET volumes
 }
 
+__volume-json() {
+  jq -n -f "$ABSOLUTE_PATH/volume.jq"
+}
+
 create-volume() {
-  local data="$(<"$ABSOLUTE_PATH/volume.json" jq --arg name "$1" '.name |= $name')"
-  __curl-do POST volumes -d "$data"
+  __curl-do POST volumes -d "$(__volume-json)"
+}
+
+__volume-name() {
+  __volume-json | jq -r .name
 }
 
 __volume-id() {
-  list-volumes | jq -r --arg name "$1" '.volumes | map(select(.name == $name)) | first | .id'
+  list-volumes | jq -r --arg name "$(__volume-name)" '.volumes | map(select(.name == $name)) | first | .id'
 }
 
 delete-volume() {
-  read -p 'enter the volume id: ' given_volume_id
-  local volume_id="$(__volume-id "$1")"
-  test "$given_volume_id" = "$volume_id" || exit 1
-  __curl-do DELETE "volumes/$volume_id" -d ''
-}
-
-attach-volume() {
-  local droplet_id="$(__droplet-id "$2")"
-  local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"attach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
-  __curl-do POST "volumes/actions" -d "$data"
-}
-
-detach-volume() {
-  local droplet_id="$(__droplet-id "$2")"
-  local data="$(jq -n --arg volume_name "$1" --argjson droplet_id "$droplet_id" '{type:"detach",volume_name:$volume_name,"droplet_id":$droplet_id}')"
-  __curl-do POST "volumes/actions" -d "$data"
+  __curl-do DELETE "volumes/$(__volume-id)" -d ''
 }
