@@ -97,3 +97,15 @@ delete-droplet() {
 ssh-droplet() {
   ssh "root@$(__droplet-ip)"
 }
+
+list-domains() {
+  __curl-do GET domains
+}
+
+create-domain() {
+  __curl-do POST domains -d "$(jq -n --arg name "$DOMAIN" '{name: $name}')"
+}
+
+delete-domain() {
+  __curl-do DELETE "domains/$DOMAIN" -d ''
+}

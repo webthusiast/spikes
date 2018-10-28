@@ -2,6 +2,7 @@ Before you can use the [API](https://developers.digitalocean.com/documentation/v
 
     $ echo TOKEN=<token> >>env
     $ echo PUBLIC_SSH_KEY_FILE=<key>.pub >>env
+    $ echo DOMAIN=<domain> >>env
 
 Make some convenience functions available:
 
@@ -26,3 +27,9 @@ Destroy the droplet and volume:
 
     (do) $ delete-droplet
     (do) $ delete-volume
+
+---
+
+Create a domain:
+
+    (do) $ create-domain
