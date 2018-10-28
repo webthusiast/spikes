@@ -37,6 +37,30 @@ delete-ssh-key() {
   __curl-do DELETE "account/keys/$ssh_key_id" -d ''
 }
 
+list-volumes() {
+  __curl-do GET volumes
+}
+
+__volume-json() {
+  jq -n -f "$ABSOLUTE_PATH/volume.jq"
+}
+
+create-volume() {
+  __curl-do POST volumes -d "$(__volume-json)"
+}
+
+__volume-name() {
+  __volume-json | jq -r .name
+}
+
+__volume-id() {
+  list-volumes | jq -r --arg name "$(__volume-name)" '.volumes | map(select(.name == $name)) | first | .id'
+}
+
+delete-volume() {
+  __curl-do DELETE "volumes/$(__volume-id)" -d ''
+}
+
 list-droplets() {
   __curl-do GET droplets
 }
@@ -72,28 +96,4 @@ delete-droplet() {
 
 ssh-droplet() {
   ssh "root@$(__droplet-ip)"
-}
-
-list-volumes() {
-  __curl-do GET volumes
-}
-
-__volume-json() {
-  jq -n -f "$ABSOLUTE_PATH/volume.jq"
-}
-
-create-volume() {
-  __curl-do POST volumes -d "$(__volume-json)"
-}
-
-__volume-name() {
-  __volume-json | jq -r .name
-}
-
-__volume-id() {
-  list-volumes | jq -r --arg name "$(__volume-name)" '.volumes | map(select(.name == $name)) | first | .id'
-}
-
-delete-volume() {
-  __curl-do DELETE "volumes/$(__volume-id)" -d ''
 }
