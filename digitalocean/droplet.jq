@@ -1,5 +1,5 @@
 {
-  "name": "droplet1",
+  "name": ("droplet1." + env.DOMAIN),
   "region": "ams3",
   "size": "s-1vcpu-1gb",
   "image": "ubuntu-18-04-x64",

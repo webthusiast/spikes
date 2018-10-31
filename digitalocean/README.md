@@ -4,32 +4,36 @@ Before you can use the [API](https://developers.digitalocean.com/documentation/v
     $ echo PUBLIC_SSH_KEY_FILE=<key>.pub >>env
     $ echo DOMAIN=<domain> >>env
 
-Make some convenience functions available:
-
-    $ bash --rcfile bashrc
-    (do) $
-
 Now list all convenience functions from the bashrc:
 
-    (do) $ ?
+    $ ./do
 
 Upload your SSH key, and create a volume and a droplet:
 
-    (do) $ create-ssh
-    (do) $ create-volume
-    (do) $ create-droplet
+    $ ./do create-ssh
+    $ ./do create-volume
+    $ ./do create-droplet
 
 SSH in there:
 
-    (do) $ ssh-droplet
+    $ ./do ssh-droplet
 
 Destroy the droplet and volume:
 
-    (do) $ delete-droplet
-    (do) $ delete-volume
+    $ ./do delete-droplet
+    $ ./do delete-volume
 
 ---
 
-Create a domain:
+To associate the droplet with a domain, first create a domain and record:
 
-    (do) $ create-domain
+    $ ./do create-domain
+    $ ./do create-domain-record
+
+Update the domain record (e.g. because the droplet is recreated):
+
+    $ ./do update-domain-record
+
+Delete the domain record (e.g. because the droplet is deleted):
+
+    $ ./do delete-domain-record

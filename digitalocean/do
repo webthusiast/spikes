@@ -6,13 +6,11 @@ set -a
 . $ABSOLUTE_PATH/env
 set +a
 
-PS1="(do) $PS1"
-
-?() {
+__usage() {
   bash -c ". '$ABSOLUTE_PATH/bashrc'; typeset -F | cut -d' ' -f3 | grep -v ^__"
 }
 
-__curl-do() {
+__curl() {
   curl -X ${1:-GET} "https://api.digitalocean.com/v2/$2" -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" "${@:3}"
 }
 
@@ -21,24 +19,24 @@ __ssh-key-fingerprint() {
 }
 
 list-ssh-keys() {
-  __curl-do GET account/keys
+  __curl GET account/keys
 }
 
 list-ssh-key() {
-  __curl-do GET "account/keys/$(__ssh-key-fingerprint)"
+  __curl GET "account/keys/$(__ssh-key-fingerprint)"
 }
 
 create-ssh-key() {
-  __curl-do POST account/keys -d "$(<"$PUBLIC_SSH_KEY_FILE" jq -Rs '{name: "Personal", public_key: .}')"
+  __curl POST account/keys -d "$(<"$PUBLIC_SSH_KEY_FILE" jq -Rs '{name: "Personal", public_key: .}')"
 }
 
 delete-ssh-key() {
   local ssh_key_id="$1"
-  __curl-do DELETE "account/keys/$ssh_key_id" -d ''
+  __curl DELETE "account/keys/$ssh_key_id" -d ''
 }
 
 list-volumes() {
-  __curl-do GET volumes
+  __curl GET volumes
 }
 
 __volume-json() {
@@ -46,7 +44,7 @@ __volume-json() {
 }
 
 create-volume() {
-  __curl-do POST volumes -d "$(__volume-json)"
+  __curl POST volumes -d "$(__volume-json)"
 }
 
 __volume-name() {
@@ -58,11 +56,11 @@ __volume-id() {
 }
 
 delete-volume() {
-  __curl-do DELETE "volumes/$(__volume-id)" -d ''
+  __curl DELETE "volumes/$(__volume-id)" -d ''
 }
 
 list-droplets() {
-  __curl-do GET droplets
+  __curl GET droplets
 }
 
 __droplet-json() {
@@ -71,7 +69,7 @@ __droplet-json() {
 }
 
 create-droplet() {
-  __curl-do POST droplets -d "$(__droplet-json)"
+  __curl POST droplets -d "$(__droplet-json)"
 }
 
 __droplet-name() {
@@ -83,7 +81,7 @@ __droplet-id() {
 }
 
 list-droplet() {
-  __curl-do GET "droplets/$(__droplet-id)"
+  __curl GET "droplets/$(__droplet-id)"
 }
 
 __droplet-ip() {
@@ -91,7 +89,7 @@ __droplet-ip() {
 }
 
 delete-droplet() {
-  __curl-do DELETE "droplets/$(__droplet-id)" -d ''
+  __curl DELETE "droplets/$(__droplet-id)" -d ''
 }
 
 ssh-droplet() {
@@ -99,13 +97,40 @@ ssh-droplet() {
 }
 
 list-domains() {
-  __curl-do GET domains
+  __curl GET domains
 }
 
 create-domain() {
-  __curl-do POST domains -d "$(jq -n --arg name "$DOMAIN" '{name: $name}')"
+  __curl POST domains -d "$(jq -n '{name: env.DOMAIN, ttl: 60}')"
 }
 
 delete-domain() {
-  __curl-do DELETE "domains/$DOMAIN" -d ''
+  __curl DELETE "domains/$DOMAIN" -d ''
 }
+
+list-domain-records() {
+  __curl GET domains/$DOMAIN/records
+}
+
+create-domain-record() {
+  __curl POST domains/$DOMAIN/records -d "$(jq -n --arg ip "$(__droplet-ip)" -f dns-record.jq)"
+}
+
+__domain-record-id() {
+  list-domain-records | jq -r '.domain_records | map(select(.name == "droplet1")) | first | .id'
+}
+
+update-domain-record() {
+  export RECORD_ID=$(__domain-record-id)
+  __curl PUT "domains/$DOMAIN/records/$RECORD_ID" -d "$(jq -n --arg ip "$(__droplet-ip)" -f dns-record.jq | jq '. + {id: env.RECORD_ID}')"
+}
+
+delete-domain-record() {
+  export RECORD_ID=$(__domain-record-id)
+  __curl DELETE "domains/$DOMAIN/records/$RECORD_ID" -d ''
+}
+
+if test $# -eq 0
+then __usage
+else "$@"
+fi
