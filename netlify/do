@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+PATH="$ABSOLUTE_PATH/node_modules/.bin:$PATH"
+
+__usage() {
+  bash -c ". '$ABSOLUTE_PATH/bashrc'; typeset -F | cut -d' ' -f3 | grep -v ^__"
+}
+
+login() {
+  netlify login
+}
+
+if test $# -eq 0
+then __usage
+else "$@"
+fi
