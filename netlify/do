@@ -9,6 +9,11 @@ __usage() {
 
 login() {
   netlify login
+  netlify --telemetry-disable
+}
+
+deploy() {
+  netlify deploy --dir="$ABSOLUTE_PATH/public" "$@"
 }
 
 if test $# -eq 0
