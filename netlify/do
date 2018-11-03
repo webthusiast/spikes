@@ -7,14 +7,38 @@ __usage() {
   bash -c ". '$ABSOLUTE_PATH/bashrc'; typeset -F | cut -d' ' -f3 | grep -v ^__"
 }
 
+__here() (
+  cd $ABSOLUTE_PATH && "$@"
+)
+
+install() {
+  brew tap netlify/netlifyctl
+  brew install netlifyctl
+  __here npm install
+}
+
 login() {
   netlify login
   netlify --telemetry-disable
+  netlifyctl login
 }
 
 deploy() {
   netlify deploy --dir="$ABSOLUTE_PATH/public" "$@"
 }
+
+__site-name() {
+  local siteId="$(<$ABSOLUTE_PATH/../.netlify/state.json jq -r .siteId)"
+  netlify sites:list --json | jq -r --arg siteId "$siteId" 'map(select(.site_id == $siteId)) | first | .name'
+}
+
+setup-domain() (
+  . $ABSOLUTE_PATH/env
+  netlifyctl site update -c netlify-spike.onthetestserver.com
+  curl -X POST "https://api.digitalocean.com/v2/domains/$DOMAIN/records" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" \
+    -d "$(jq -n --arg name "$(__site-name)" -f "$ABSOLUTE_PATH/dns-record.jq")"
+)
 
 if test $# -eq 0
 then __usage
