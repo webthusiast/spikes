@@ -113,7 +113,7 @@ list-domain-records() {
 }
 
 create-domain-record() {
-  __curl POST domains/$DOMAIN/records -d "$(jq -n --arg ip "$(__droplet-ip)" -f dns-record.jq)"
+  __curl POST domains/$DOMAIN/records -d "$(jq -n --arg ip "$(__droplet-ip)" -f "$ABSOLUTE_PATH/dns-record.jq")"
 }
 
 __domain-record-id() {
@@ -122,7 +122,7 @@ __domain-record-id() {
 
 update-domain-record() {
   export RECORD_ID=$(__domain-record-id)
-  __curl PUT "domains/$DOMAIN/records/$RECORD_ID" -d "$(jq -n --arg ip "$(__droplet-ip)" -f dns-record.jq | jq '. + {id: env.RECORD_ID}')"
+  __curl PUT "domains/$DOMAIN/records/$RECORD_ID" -d "$(jq -n --arg ip "$(__droplet-ip)" -f "$ABSOLUTE_PATH/dns-record.jq" | jq '. + {id: env.RECORD_ID}')"
 }
 
 delete-domain-record() {
