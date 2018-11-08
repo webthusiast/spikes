@@ -7,7 +7,7 @@ set -a
 set +a
 
 __usage() {
-  bash -c ". '$ABSOLUTE_PATH/bashrc'; typeset -F | cut -d' ' -f3 | grep -v ^__"
+  bash -c ". '${BASH_SOURCE[0]}'; typeset -F | cut -d' ' -f3 | grep -v ^__"
 }
 
 __curl() {
@@ -130,7 +130,7 @@ delete-domain-record() {
   __curl DELETE "domains/$DOMAIN/records/$RECORD_ID" -d ''
 }
 
-if test $# -eq 0
+if test $# -eq 0 && test $(basename ${0#-}) = $(basename ${BASH_SOURCE[0]})
 then __usage
 else "$@"
 fi
