@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "prepare": "commonmark <README.md >README.html",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "commonmark": "^0.28.1",
+    "electron": "^4.0.0"
+  }
+}
