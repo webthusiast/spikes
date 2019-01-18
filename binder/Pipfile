@@ -6,6 +6,15 @@ name = "pypi"
 [packages]
 jupyter = "*"
 jupyterlab = "*"
+numpy = "*"
+pandas = "*"
+scipy = "*"
+scikit-learn = "*"
+altair = "*"
+vega-datasets = "*"
+sympy = "*"
+matplotlib = "*"
+statsmodels = "*"
 
 [dev-packages]
 
