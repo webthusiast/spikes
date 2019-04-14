@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
+set -a
+. $ABSOLUTE_PATH/env
+set +a
+
+__usage() {
+  bash -c ". '${BASH_SOURCE[0]}'; typeset -F | cut -d' ' -f3 | grep -v ^__"
+}
+
+get-jwt() {
+  jq -n -f token.jq > token.json
+  curl -X POST "https://$YOUR_DOMAIN/oauth/token" -H 'content-type: application/json' -d @token.json >jwt.json
+}
+
+if test $# -eq 0 && test $(basename ${0#-}) = $(basename ${BASH_SOURCE[0]})
+then __usage
+else "$@"
+fi
