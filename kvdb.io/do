@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
+set -a
+. $ABSOLUTE_PATH/env
+set +a
+
+__usage() {
+  bash -c ". '${BASH_SOURCE[0]}'; typeset -F | cut -d' ' -f3 | grep -v ^__"
+}
+
+create-bucket() {
+  curl https://kvdb.io -d "secret_key=$SECRET_KEY" -d "write_key=$WRITE_KEY" -d "signing_key=$WRITE_KEY" -d "default_ttl=$DEFAULT_TTL" >"$ABSOLUTE_PATH/bucket"
+}
+
+list-keys() {
+  curl "https://kvdb.io/$(cat bucket)/?values=true&format=jsonl" -u "$SECRET_KEY:"
+}
+
+delete-bucket() {
+  curl -XDELETE "https://kvdb.io/$(cat bucket)/" -u "$SECRET_KEY:"
+}
+
+set-value() {
+  curl "https://kvdb.io/$(cat bucket)/$1" -u "$WRITE_KEY:" -d "$2"
+}
+
+delete-key() {
+  : "${1:?give the key to delete as an argument}"
+  curl -XDELETE "https://kvdb.io/$(cat bucket)/$1" -u "$SECRET_KEY:"
+}
+
+if test $# -eq 0 && test $(basename ${0#-}) = $(basename ${BASH_SOURCE[0]})
+then __usage
+else "$@"
+fi
