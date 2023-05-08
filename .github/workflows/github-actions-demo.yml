@@ -23,4 +23,4 @@ jobs:
           FAKE_SECRET: ${{ secrets.FAKE_SECRET }}
         run: |
           echo Fake password: "$FAKE_SECRET"
-          echo Length (should be 8): "${#FAKE_SECRET}"
+          echo 'Length (should be 8):' "${#FAKE_SECRET}"
