@@ -23,11 +23,15 @@ jobs:
       - Preprocess
     runs-on: ubuntu-latest
     steps:
-      - env:
+      - id: step1
+        env:
           FAKE_SECRET: ${{ secrets.FAKE_SECRET }}
         run: |
           echo Fake password: "$FAKE_SECRET"
           echo 'Length (should be 8):' "${#FAKE_SECRET}"
+          echo length=${#FAKE_SECRET} >> "$GITHUB_OUTPUT"
+    outputs:
+      PASSWORD_LENGTH: ${{ steps.step1.outputs.length }}
   Fan-out:
     runs-on: ubuntu-latest
     steps:
@@ -50,4 +54,6 @@ jobs:
       - Postprocess
     runs-on: ubuntu-latest
     steps:
-      - run: echo Start
+      - env:
+          PASSWORD_LENGTH: ${{ needs.Use-secret.outputs.PASSWORD_LENGTH }}
+        run: echo Done, password length is $PASSWORD_LENGTH
