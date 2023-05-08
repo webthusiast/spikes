@@ -16,3 +16,8 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  Use-secret:
+    steps:
+      - env:
+          FAKE_SECRET: ${{ secrets.FakeSecret }}
+      - run: echo Fake password: "$FAKE_SECRET"
