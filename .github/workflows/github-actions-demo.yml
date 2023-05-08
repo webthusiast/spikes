@@ -47,7 +47,9 @@ jobs:
       - Use-secret
     runs-on: ubuntu-latest
     steps:
-      - run: echo Postprocess
+      - env:
+          PASSWORD_LENGTH: ${{ needs.Use-secret.outputs.PASSWORD_LENGTH }}
+        run: echo Postprocess, password length is $PASSWORD_LENGTH
   Fan-in:
     needs:
       - Explore-GitHub-Actions
