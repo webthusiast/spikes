@@ -20,6 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - env:
-          FAKE_SECRET: ${{ secrets.FakeSecret }}
+          FAKE_SECRET: ${{ secrets.FAKE_SECRET }}
         run: |
           echo Fake password: "$FAKE_SECRET"
