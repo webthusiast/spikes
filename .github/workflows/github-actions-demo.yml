@@ -20,7 +20,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Use-secret:
     needs:
-      - Fan-out
+      - Preprocess
     runs-on: ubuntu-latest
     steps:
       - env:
@@ -32,10 +32,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo Start
+  Preprocess:
+    needs:
+      - Fan-out
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Preprocess
+  Postprocess:
+    needs:
+      - Use-secret
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Postprocess
   Fan-in:
     needs:
       - Explore-GitHub-Actions
-      - Use-secret
+      - Postprocess
     runs-on: ubuntu-latest
     steps:
       - run: echo Start
