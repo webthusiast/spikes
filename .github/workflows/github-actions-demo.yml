@@ -20,5 +20,5 @@ jobs:
     steps:
       - env:
           FAKE_SECRET: ${{ secrets.FakeSecret }}
-      - run: |
+        run: |
           echo Fake password: "$FAKE_SECRET"
