@@ -49,13 +49,20 @@ jobs:
     steps:
       - env:
           PASSWORD_LENGTH: ${{ needs.Use-secret.outputs.PASSWORD_LENGTH }}
-        run: echo Postprocess, password length is $PASSWORD_LENGTH
+        run: |
+          echo Postprocess, password length is $PASSWORD_LENGTH | tee > artifact.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: artifact.txt
   Fan-in:
     needs:
       - Explore-GitHub-Actions
       - Postprocess
     runs-on: ubuntu-latest
     steps:
-      - env:
-          PASSWORD_LENGTH: ${{ needs.Use-secret.outputs.PASSWORD_LENGTH }}
-        run: echo Done, password length is $PASSWORD_LENGTH
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+      - run: ls -l
+      - run: cat artifact.txt
