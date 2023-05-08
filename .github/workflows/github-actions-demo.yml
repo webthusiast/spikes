@@ -17,6 +17,7 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Use-secret:
+    runs-on: ubuntu-latest
     steps:
       - env:
           FAKE_SECRET: ${{ secrets.FakeSecret }}
