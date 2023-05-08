@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   Explore-GitHub-Actions:
+    needs:
+      - Fan-out
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -17,6 +19,8 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Use-secret:
+    needs:
+      - Fan-out
     runs-on: ubuntu-latest
     steps:
       - env:
@@ -24,3 +28,14 @@ jobs:
         run: |
           echo Fake password: "$FAKE_SECRET"
           echo 'Length (should be 8):' "${#FAKE_SECRET}"
+  Fan-out:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Start
+  Fan-in:
+    needs:
+      - Explore-GitHub-Actions
+      - Use-secret
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Start
