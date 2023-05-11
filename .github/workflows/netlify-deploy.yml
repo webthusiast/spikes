@@ -1,0 +1,10 @@
+name: Deploy on Netlify
+on: [push]
+jobs:
+  Deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm install
+      - env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: ./do deploy
