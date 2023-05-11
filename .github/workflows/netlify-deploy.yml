@@ -24,4 +24,11 @@ jobs:
       - run: npm install
       - env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: ./do deploy
+        run: |
+          case ${{inputs.URL}} in
+            draft)
+              ./do deploy;;
+            'main site')
+              ./do deploy --prod;;
+            *) exit 1;;
+          esac
