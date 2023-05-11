@@ -1,10 +1,14 @@
 name: Deploy on Netlify
 on: [push]
+defaults:
+  run:
+    working-directory: netlify
 jobs:
   Deploy-preview:
     runs-on: ubuntu-latest
     steps:
-      - run: pwd
+      - name: Check out repository code
+        uses: actions/checkout@v3
       - run: ls -al
       - run: npm install
       - env:
