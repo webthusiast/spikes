@@ -1,5 +1,16 @@
 name: Deploy on Netlify
-on: [push, workflow_dispatch]
+on:
+  push: {}
+  workflow_dispatch:
+    inputs:
+      URL:
+        description: URL
+        required: true
+        default: draft
+        type: choice
+        options:
+        - draft
+        - main site
 defaults:
   run:
     working-directory: netlify
