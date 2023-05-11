@@ -1,5 +1,8 @@
 name: Deploy on Netlify
 on: [push]
+defaults:
+  run:
+    working-directory: netlify
 jobs:
   Deploy-preview:
     runs-on: ubuntu-latest
