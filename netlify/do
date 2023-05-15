@@ -24,7 +24,7 @@ login() {
 }
 
 deploy() {
-  netlify deploy --dir="$ABSOLUTE_PATH/public" "$@"
+  netlify deploy --dir="$ABSOLUTE_PATH/public" --functions="$ABSOLUTE_PATH/functions" --json "$@"
 }
 
 __site-name() {

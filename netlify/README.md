@@ -11,3 +11,9 @@ On the first run, this links the local project with a Netlify site, and creates 
 If it looks good, move it to prod:
 
     $ ./do deploy --prod
+
+### Functions
+
+See [docs](https://docs.netlify.com/functions/create/?fn-language=js).
+
+The function is accessible on `<domain>/.netlify/functions/first`, so in production on https://netlify-spike.onthetestserver.com/.netlify/functions/first.
