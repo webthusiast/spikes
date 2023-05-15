@@ -4,3 +4,4 @@
 [Build]
   Publish = ""
   Functions = ""
+  Edge_functions = "./edge-functions"
