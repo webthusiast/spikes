@@ -31,4 +31,11 @@ jobs:
             'main site')
               ./do deploy --prod;;
             *) exit 1;;
-          esac
+          esac | tee deploy.json
+      - name: Test static page
+        run: curl $(<deploy.json jq -r .deploy_url) | grep 'Hello, World!'
+      - name: Test function
+        run: curl $(<deploy.json jq -r .deploy_url)/.netlify/functions/first | jq -e '.message == "Hello World"'
+      - name: Test edge function
+        run: curl $(<deploy.json jq -r .deploy_url)/hello | grep 'Hello, World!'
+        continue-on-error: true
