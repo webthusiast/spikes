@@ -17,19 +17,17 @@ defaults:
   run:
     working-directory: netlify
 jobs:
-  Deploy-preview:
+  Deploy:
     runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
       - run: ls -al
       - run: npm install
-      - env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: ./do authorize-netlify
-      - env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: |
+      - run: ./do authorize-netlify
+      - run: |
           case '${{inputs.URL}}' in
             '' | draft)
               ./do deploy;;
@@ -38,6 +36,7 @@ jobs:
             *) exit 1;;
           esac | tee deploy.json
   Test:
+    needs: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Test static page
