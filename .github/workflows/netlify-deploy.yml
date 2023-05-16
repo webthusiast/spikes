@@ -26,6 +26,9 @@ jobs:
       - run: npm install
       - env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: ./do authorize-netlify
+      - env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: |
           case '${{inputs.URL}}' in
             '' | draft)
