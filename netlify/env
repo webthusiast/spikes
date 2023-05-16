@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# For secrets, for local use
+
+export NETLIFY_AUTH_TOKEN=$(pass netlify-token)
+export FAUNA_KEY=$(pass faunadb/keys/worklaptop)
+export FAUNA_KEY_NETLIFY=$(pass faunadb/keys/netlify)

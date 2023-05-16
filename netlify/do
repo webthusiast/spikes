@@ -27,6 +27,10 @@ deploy() {
   netlify deploy --dir="$ABSOLUTE_PATH/public" --functions="$ABSOLUTE_PATH/functions" --json "$@"
 }
 
+authorize-netlify() {
+  netlify env:set FAUNA_KEY "$FAUNA_KEY_NETLIFY"
+}
+
 __site-name() {
   local siteId="$(<$ABSOLUTE_PATH/../.netlify/state.json jq -r .siteId)"
   netlify sites:list --json | jq -r --arg siteId "$siteId" 'map(select(.site_id == $siteId)) | first | .name'
