@@ -34,6 +34,9 @@ jobs:
               ./do deploy --prod;;
             *) exit 1;;
           esac | tee deploy.json
+  Test:
+    runs-on: ubuntu-latest
+    steps:
       - name: Test static page
         run: curl $(<deploy.json jq -r .deploy_url) | grep 'Hello, World!'
       - name: Test function
