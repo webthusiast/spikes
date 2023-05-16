@@ -13,12 +13,12 @@ on:
         options:
         - draft
         - main site
-defaults:
-  run:
-    working-directory: netlify
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: netlify
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
     steps:
