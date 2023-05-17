@@ -38,7 +38,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: deployment
-          path: deploy.json
+          path: netlify/deploy.json
   Test:
     needs: Deploy
     runs-on: ubuntu-latest
@@ -46,6 +46,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: deployment
+      - run: ls -al
       - name: Test static page
         run: curl $(<deploy.json jq -r .deploy_url) | grep 'Hello, World!'
       - name: Test function
