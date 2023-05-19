@@ -2,7 +2,8 @@ name: Deploy on Netlify
 on:
   push:
     paths:
-      - netlify/
+      - .github/workflows/netlify-deploy.yml
+      - 'netlify/**'
   workflow_dispatch:
     inputs:
       URL:
